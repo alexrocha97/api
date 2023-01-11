@@ -72,6 +72,7 @@ app.MapPut("/Produto/{Id}", (int Id ,ProdutoDto produtoDto, Context context) => 
     produto.Descricao = produtoDto.Descricao;
     produto.Categoria = categoria;
     produto.Tags = new List<Tag>();
+    
     if(produtoDto.Tags != null){
         produto.Tags = new List<Tag>();
         foreach (var item in produtoDto.Tags){
@@ -83,10 +84,11 @@ app.MapPut("/Produto/{Id}", (int Id ,ProdutoDto produtoDto, Context context) => 
 });
 
 // Delete
-app.MapDelete("/Produto/{code}", (string code) => {
-    var produto = ProdutoRepositorio.GetBy(code);
+app.MapDelete("/Produto/{Id}", (int Id, Context context) => {
+    var produto = context.tblProdutos.Where(x => x.Id == Id).FirstOrDefault();
     if(produto != null){
-        ProdutoRepositorio.Remove(produto);
+        context.tblProdutos.Remove(produto);
+        context.SaveChanges();
         return Results.Ok("Produto deletado com sucesso!");
     }
     return Results.BadRequest("Ocorreu um erro ao deletar o produto");
